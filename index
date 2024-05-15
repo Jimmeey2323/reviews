@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Cards Animation</title>
+<style>
+    :root {
+        --momenceReviewColorBackground: #FBFBFB;
+        --momenceBorder: 1px solid rgba(0, 0, 0, 0.08);
+        --momenceBorderRadius: 24px;
+        --momenceBoxShadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.10);
+    }
+
+    #momence-plugin-reviews {
+        overflow: hidden;
+        white-space: nowrap;
+        animation: slide 15s linear infinite;
+    }
+
+    @keyframes slide {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    .momence-review-card {
+        display: inline-block;
+        margin-right: 20px;
+        padding: 20px;
+        background-color: var(--momenceReviewColorBackground);
+        border: var(--momenceBorder);
+        border-radius: var(--momenceBorderRadius);
+        box-shadow: var(--momenceBoxShadow);
+    }
+</style>
+</head>
+<body>
+    <div id="momence-plugin-reviews">
+        <div class="momence-review-card">Review 1</div>
+        <div class="momence-review-card">Review 2</div>
+        <div class="momence-review-card">Review 3</div>
+        <div class="momence-review-card">Review 4</div>
+    </div>
+    <script
+        async
+        type="module"
+        host_id="13752"
+        is_profile_picture_enabled="true"
+        is_text_only_enabled="true"
+        layout="horizontal"
+        location_id="9030"
+        signature="f9957966c7cdbb70cd62920c3ebfdb08f0dcee5eeee3b8e9510c1e1901bd1184"
+        src="https://momence.com/plugin/reviews/reviews.js">
+    </script>
+</body>
+</html>
