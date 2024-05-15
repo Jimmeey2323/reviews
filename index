@@ -5,52 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Review Cards Animation</title>
 <style>
-    :root {
-        --momenceReviewColorBackground: #FBFBFB;
-        --momenceBorder: 1px solid rgba(0, 0, 0, 0.08);
-        --momenceBorderRadius: 24px;
-        --momenceBoxShadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.10);
-    }
+  
+  #reviews-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-    #momence-plugin-reviews {
-        overflow: hidden;
-        white-space: nowrap;
-        animation: slide 15s linear infinite;
-    }
+.review-card {
+  padding: 10px;
+  background-color: #FBFBFB;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0px 4px 32px 0px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  transform: translateY(-50px);
+  transition: opacity 0.5s, transform 0.5s;
+}
 
-    @keyframes slide {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
-    }
+.slide-in {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    .momence-review-card {
-        display: inline-block;
-        margin-right: 20px;
-        padding: 20px;
-        background-color: var(--momenceReviewColorBackground);
-        border: var(--momenceBorder);
-        border-radius: var(--momenceBorderRadius);
-        box-shadow: var(--momenceBoxShadow);
-    }
 </style>
 </head>
 <body>
-    <div id="momence-plugin-reviews">
-        <div class="momence-review-card">Review 1</div>
-        <div class="momence-review-card">Review 2</div>
-        <div class="momence-review-card">Review 3</div>
-        <div class="momence-review-card">Review 4</div>
-    </div>
-    <script
-        async
-        type="module"
-        host_id="13752"
-        is_profile_picture_enabled="true"
-        is_text_only_enabled="true"
-        layout="horizontal"
-        location_id="9030"
-        signature="f9957966c7cdbb70cd62920c3ebfdb08f0dcee5eeee3b8e9510c1e1901bd1184"
-        src="https://momence.com/plugin/reviews/reviews.js">
+<div id="reviews-container"></div>
+  <script>
+    (async () => {
+      const loginHeaders = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      const loginPayload = {
+        email: 'jimmeey@physique57india.com',
+        password: 'Jimmeey@123',
+      };
+      let options = {
+        method: 'POST',
+        headers: loginHeaders,
+        body: JSON.stringify(loginPayload),
+        muteHttpExceptions: true
+      };
+      const loginResponse = await fetch('https://api.momence.com/auth/login', options);
+      if (!loginResponse.ok) {
+        console.error('Authentication failed. Check your credentials.');
+        return;
+      }
+
+      const cookie = loginResponse.headers.get('Set-Cookie');
+      console.log('Cookie Value: ' + cookie);
+
+      const dataHeaders = {
+        'Accept': 'application/json',
+        'Cookie': cookie,
+      };
+
+      // Fetch reviews
+      const reviewsResponse = await fetch('https://api.momence.com/host-plugins/host/13752/reviews?pageSize=25&page=0&isTextOnlyEnabled=true&s=f9957966c7cdbb70cd62920c3ebfdb08f0dcee5eeee3b8e9510c1e1901bd1184', {
+        headers: dataHeaders
+      });
+      if (!reviewsResponse.ok) {
+        console.error('Failed to fetch reviews.');
+        return;
+      }
+
+      const reviewsData = await reviewsResponse.json();
+
+      // Display reviews as cards
+      const reviewsContainer = document.getElementById('reviews-container');
+
+      reviewsData.reviews.forEach(review => {
+        const reviewCard = document.createElement('div');
+        reviewCard.classList.add('review-card');
+        reviewCard.innerText = review.text;
+        reviewsContainer.appendChild(reviewCard);
+      });
+
+      // Animate cards
+      document.querySelectorAll('.review-card').forEach((card, index) => {
+        card.style.transitionDelay = `${index * 0.2}s`;
+        card.classList.add('slide-in');
+      });
+    })();
     </script>
 </body>
 </html>
