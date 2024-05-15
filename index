@@ -5,90 +5,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Review Cards Animation</title>
 <style>
-  
   #reviews-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+    display: flex;
+    flex-direction: row;
+    max-width: 100%;
+    overflow: hidden; /* Ensure the container does not show overflow */
+    white-space: wrap;
+    max-height:300px;
+    animation: horizontalScroll 20s linear infinite; /* Horizontal loop animation */
+  }
 
-.review-card {
-  padding: 10px;
-  background-color: #FBFBFB;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  box-shadow: 0px 4px 32px 0px rgba(0, 0, 0, 0.16);
-  opacity: 0;
-  transform: translateY(-50px);
-  transition: opacity 0.5s, transform 0.5s;
-}
+  .review-card {
+    padding: 10px;
+    background-color: #FBFBFB;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0px 4px 32px 0px rgba(0, 0, 0, 0.16);
+    opacity: 0;
+    transform: translateY(-50px);
+    transition: opacity 0.5s, transform 0.5s;
+    width: 300px; /* Set the width of the cards */
+    margin-right: 30px; /* Add some space between cards */
+    display: grid-row; /* Ensure cards are displayed in a line */
+  }
 
-.slide-in {
-  opacity: 1;
-  transform: translateY(0);
-}
+  .review-card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    max-height: 5em;
+    font-size:6px;/* Limit the height to 3 lines */
+    margin-bottom: 5px; /* Add some space below the text */
+  }
 
+  .slide-in {
+    opacity: 1;
+    transform: translateY(50px);
+  }
+
+  @keyframes horizontalScroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 </style>
 </head>
 <body>
 <div id="reviews-container"></div>
-  <script>
-    (async () => {
-      const loginHeaders = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      const loginPayload = {
-        email: 'jimmeey@physique57india.com',
-        password: 'Jimmeey@123',
-      };
-      let options = {
-        method: 'POST',
-        headers: loginHeaders,
-        body: JSON.stringify(loginPayload),
-        muteHttpExceptions: true
-      };
-      const loginResponse = await fetch('https://api.momence.com/auth/login', options);
-      if (!loginResponse.ok) {
-        console.error('Authentication failed. Check your credentials.');
-        return;
-      }
+<script>
+  (async () => {
+    const loginHeaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    const loginPayload = {
+      email: 'jimmeey@physique57india.com',
+      password: 'Jimmeey@123',
+    };
+    let options = {
+      method: 'POST',
+      headers: loginHeaders,
+      body: JSON.stringify(loginPayload),
+      muteHttpExceptions: true
+    };
+    const loginResponse = await fetch('https://api.momence.com/auth/login', options);
+    if (!loginResponse.ok) {
+      console.error('Authentication failed. Check your credentials.');
+      return;
+    }
 
-      const cookie = loginResponse.headers.get('Set-Cookie');
-      console.log('Cookie Value: ' + cookie);
+    const cookie = loginResponse.headers.get('Set-Cookie');
+    console.log('Cookie Value: ' + cookie);
 
-      const dataHeaders = {
-        'Accept': 'application/json',
-        'Cookie': cookie,
-      };
+    const dataHeaders = {
+      'Accept': 'application/json',
+      'Cookie': cookie,
+    };
 
-      // Fetch reviews
-      const reviewsResponse = await fetch('https://api.momence.com/host-plugins/host/13752/reviews?pageSize=25&page=0&isTextOnlyEnabled=true&s=f9957966c7cdbb70cd62920c3ebfdb08f0dcee5eeee3b8e9510c1e1901bd1184', {
-        headers: dataHeaders
-      });
-      if (!reviewsResponse.ok) {
-        console.error('Failed to fetch reviews.');
-        return;
-      }
+    // Fetch reviews
+    const reviewsResponse = await fetch('https://api.momence.com/host-plugins/host/13752/reviews?pageSize=105&page=0&isTextOnlyEnabled=true&s=f9957966c7cdbb70cd62920c3ebfdb08f0dcee5eeee3b8e9510c1e1901bd1184', {
+      headers: dataHeaders
+    });
+    if (!reviewsResponse.ok) {
+      console.error('Failed to fetch reviews.');
+      return;
+    }
 
-      const reviewsData = await reviewsResponse.json();
+    const reviewsData = await reviewsResponse.json();
 
-      // Display reviews as cards
-      const reviewsContainer = document.getElementById('reviews-container');
+    // Display reviews as cards
+    const reviewsContainer = document.getElementById('reviews-container');
 
-      reviewsData.reviews.forEach(review => {
-        const reviewCard = document.createElement('div');
-        reviewCard.classList.add('review-card');
-        reviewCard.innerText = review.text;
-        reviewsContainer.appendChild(reviewCard);
-      });
+    // Modify the template for each card to include star ratings
+    reviewsData.payload.forEach((review, index) => {
+      const reviewCard = document.createElement('div');
+      reviewCard.classList.add('review-card');
+      reviewCard.innerHTML = `
+        <div>Reviewer: ${review.reviewerName}</div>
+        <div>Rating: ${'⭐'.repeat(review.grade)}</div> <!-- Use star character for ratings -->
+        <div>Comment: ${review.comment}</div>
+      `;
+      reviewsContainer.appendChild(reviewCard);
 
       // Animate cards
-      document.querySelectorAll('.review-card').forEach((card, index) => {
-        card.style.transitionDelay = `${index * 0.2}s`;
-        card.classList.add('slide-in');
-      });
-    })();
-    </script>
+      setTimeout(() => {
+        reviewCard.style.opacity = 1;
+        reviewCard.style.transform = 'translateY(0)';
+      }, index * 200); // 200ms delay between each card
+    });
+  })();
+</script>
 </body>
 </html>
